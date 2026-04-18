@@ -7,10 +7,8 @@ def detect_bugs(code):
     except SyntaxError as e:
         return f"Syntax Error: {e}"
 
-
 def complexity_analysis(code):
-    tree = ast.parse(code)
-    loops = sum(isinstance(node, (ast.For, ast.While)) for node in ast.walk(tree))
+    loops = code.count("for") + code.count("while")
 
     if loops == 0:
         return "O(1)"
@@ -21,33 +19,53 @@ def complexity_analysis(code):
     else:
         return "O(n^k)"
 
+def suggest_optimization(complexity):
+    if complexity == "O(n^2)":
+        return "Try using hashing or sorting to reduce complexity"
+    elif complexity == "O(n)":
+        return "Consider early exit or binary search optimization"
+    else:
+        return "Code is already optimal"
 
 def code_quality(code):
     score = 10
+
     if len(code) > 300:
         score -= 2
     if "def " not in code:
         score -= 2
     if "#" not in code:
         score -= 2
+
     return max(score, 0)
 
-
-def optimization_suggestions(complexity):
-    if complexity == "O(n^2)":
-        return "Try using sorting or binary search to improve to O(n log n)"
-    elif complexity == "O(n)":
-        return "Efficient. Minor optimizations possible."
-    else:
-        return "Optimization unclear."
-
-
 def analyze_code(code):
+    bugs = detect_bugs(code)
     complexity = complexity_analysis(code)
+    quality = code_quality(code)
 
     return {
-        "bugs": detect_bugs(code),
+        "bugs": bugs,
         "complexity": complexity,
-        "quality_score": code_quality(code),
-        "suggestion": optimization_suggestions(complexity)
+        "quality_score": quality,
+        "optimization": suggest_optimization(complexity)
     }
+
+def project_analysis(files_dict):
+    report = {}
+    seen_functions = set()
+
+    for file, code in files_dict.items():
+        result = analyze_code(code)
+
+        for line in code.split("\n"):
+            if line.strip().startswith("def "):
+                name = line.split("(")[0]
+                if name in seen_functions:
+                    result["duplication"] = "Duplicate function detected"
+                else:
+                    seen_functions.add(name)
+
+        report[file] = result
+
+    return report

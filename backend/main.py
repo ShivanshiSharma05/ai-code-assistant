@@ -1,55 +1,44 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-
 from model import generate_code, generate_comment
-from analyzer import analyze_code
-from github_service import get_repo_files
+from analyzer import analyze_code, project_analysis
+from github_integration import get_repo_files
 
-app = FastAPI(title="AI Code Assistant")
+app = FastAPI()
 
-class CodeRequest(BaseModel):
-    prompt: str
+request_count = 0
+LIMIT = 200
 
-class CommentRequest(BaseModel):
-    code: str
-
-class AnalyzeRequest(BaseModel):
-    code: str
-
-class RepoRequest(BaseModel):
-    repo_url: str
-
+def check_limit():
+    global request_count
+    request_count += 1
+    if request_count > LIMIT:
+        return {"error": "Rate limit exceeded"}
+    return None
 
 @app.get("/")
 def home():
-    return {"message": "AI Code Assistant Running 🚀"}
-
+    return {"message": "AI Code Assistant Running"}
 
 @app.post("/generate-code/")
-def gen_code(request: CodeRequest):
-    return {"output": generate_code(request.prompt)}
-
+def gen_code(prompt: str):
+    limit = check_limit()
+    if limit:
+        return limit
+    return {"output": generate_code(prompt)}
 
 @app.post("/generate-comment/")
-def gen_comment(request: CommentRequest):
-    return {"output": generate_comment(request.code)}
-
+def gen_comment(code: str):
+    return {"output": generate_comment(code)}
 
 @app.post("/analyze/")
-def analyze(request: AnalyzeRequest):
-    return analyze_code(request.code)
+def analyze(code: str):
+    return analyze_code(code)
 
+@app.post("/project-analysis/")
+def project_level(files: dict):
+    return project_analysis(files)
 
 @app.post("/analyze-repo/")
-def analyze_repo(request: RepoRequest):
-    files = get_repo_files(request.repo_url)
-
-    results = []
-    for file in files:
-        analysis = analyze_code(file["code"])
-        results.append({
-            "file": file["name"],
-            "analysis": analysis
-        })
-
-    return results
+def analyze_repo(repo_name: str):
+    files = get_repo_files(repo_name)
+    return project_analysis(files)

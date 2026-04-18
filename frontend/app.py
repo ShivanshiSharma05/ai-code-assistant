@@ -1,35 +1,33 @@
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8000"
+API = "http://127.0.0.1:8000"
 
-st.title("🤖 AI Code Assistant")
+st.title("🚀 AI Code Assistant")
 
-option = st.sidebar.selectbox(
-    "Select Feature",
-    ["Generate Code", "Explain Code", "Analyze Code", "Analyze GitHub Repo"]
-)
+code = st.text_area("Enter Code")
+prompt = st.text_input("Enter Prompt")
 
-if option == "Generate Code":
-    prompt = st.text_area("Enter prompt")
-    if st.button("Generate"):
-        res = requests.post(f"{API_URL}/generate-code/", json={"prompt": prompt})
-        st.code(res.json()["output"])
+if st.button("Generate Code"):
+    res = requests.post(f"{API}/generate-code/", params={"prompt": prompt})
+    st.code(res.json()["output"])
 
-elif option == "Explain Code":
-    code = st.text_area("Enter code")
-    if st.button("Explain"):
-        res = requests.post(f"{API_URL}/generate-comment/", json={"code": code})
-        st.write(res.json()["output"])
+if st.button("Generate Comment"):
+    res = requests.post(f"{API}/generate-comment/", params={"code": code})
+    st.write(res.json()["output"])
 
-elif option == "Analyze Code":
-    code = st.text_area("Enter code")
-    if st.button("Analyze"):
-        res = requests.post(f"{API_URL}/analyze/", json={"code": code})
-        st.json(res.json())
+if st.button("Analyze Code"):
+    res = requests.post(f"{API}/analyze/", params={"code": code})
+    data = res.json()
 
-elif option == "Analyze GitHub Repo":
-    repo = st.text_input("Enter GitHub repo URL")
-    if st.button("Analyze Repo"):
-        res = requests.post(f"{API_URL}/analyze-repo/", json={"repo_url": repo})
-        st.json(res.json())
+    st.write("### 🐞 Bugs:", data["bugs"])
+    st.write("### 📊 Complexity:", data["complexity"])
+    st.write("### ⚡ Optimization:", data["optimization"])
+    st.write("### ⭐ Quality Score:", data["quality_score"])
+
+st.subheader("🔗 Analyze GitHub Repo")
+repo = st.text_input("Enter repo (username/repo)")
+
+if st.button("Analyze Repo"):
+    res = requests.post(f"{API}/analyze-repo/", params={"repo_name": repo})
+    st.json(res.json())
