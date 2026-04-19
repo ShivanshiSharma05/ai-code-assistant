@@ -1,8 +1,8 @@
-from transformers import pipeline
+import math
 
-# Stable small model (works on most systems)
-generator = pipeline("text-generation", model="Salesforce/codegen-350M-mono")
-
+# -------------------------------
+# 🔹 CLEAN OUTPUT FUNCTION
+# -------------------------------
 def clean_output(text):
     lines = text.split("\n")
     clean_lines = []
@@ -10,83 +10,112 @@ def clean_output(text):
     for line in lines:
         line = line.strip()
 
-        if (
-            not line or
-            line.startswith("#") or
-            "print(" in line and len(line) > 40
-        ):
+        if not line:
             continue
 
         clean_lines.append(line)
 
-    return "\n".join(clean_lines[:15])  
+    return "\n".join(clean_lines[:20])
 
-def generate_code(prompt):
-    formatted = f"Write a Python function for: {prompt}\n\n"
 
-    result = generator(
-        formatted,
-        max_length=100,
-        temperature=0.2,
-        do_sample=True
-    )
+# -------------------------------
+# 🔹 CODE GENERATION (LIGHTWEIGHT)
+# -------------------------------
+def generate_code(prompt: str):
+    prompt = prompt.lower()
 
-    output = result[0]['generated_text']
+    if "prime" in prompt:
+        code = """def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, int(n**0.5)+1):
+        if n % i == 0:
+            return False
+    return True"""
 
-    if "def " in output:
-        parts = output.split("def ")
-        output = "def " + parts[1]
+    elif "factorial" in prompt:
+        code = """def factorial(n):
+    if n == 0:
+        return 1
+    return n * factorial(n-1)"""
 
-    if "# Driver Code" in output:
-        output = output.split("# Driver Code")[0]
+    elif "fibonacci" in prompt:
+        code = """def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        print(a)
+        a, b = b, a + b"""
 
-    return clean_output(output)
+    elif "palindrome" in prompt:
+        code = """def is_palindrome(s):
+    return s == s[::-1]"""
 
-def generate_comments_inline(code):
-    lines = code.split("\n")
-    commented_code = []
+    elif "sum of array" in prompt or "sum list" in prompt:
+        code = """def array_sum(arr):
+    return sum(arr)"""
 
-    for line in lines:
-        stripped = line.strip()
+    else:
+        code = "# Code generation coming soon for this problem..."
 
-        if stripped.startswith("def"):
-            commented_code.append("# Function definition")
-        elif stripped.startswith("for"):
-            commented_code.append("# Loop to iterate")
-        elif stripped.startswith("if"):
-            commented_code.append("# Conditional check")
-        elif "return" in stripped:
-            commented_code.append("# Return result")
-        elif "print" in stripped:
-            commented_code.append("# Output statement")
+    return clean_output(code)
 
-        commented_code.append(line)
 
-    return "\n".join(commented_code)
-
-def generate_comment(code):
+# -------------------------------
+# 🔹 CODE EXPLANATION
+# -------------------------------
+def generate_comment(code: str):
     lines = code.strip().split("\n")
-
     explanation = []
 
     for line in lines:
         line = line.strip()
 
-        if line.startswith("for"):
-            explanation.append("• A loop is used to iterate over a range of values")
+        if line.startswith("def"):
+            explanation.append("• Function is defined")
+
+        elif line.startswith("for"):
+            explanation.append("• Loop is used to iterate")
 
         elif line.startswith("if"):
-            explanation.append("• A conditional check is performed")
+            explanation.append("• Conditional check is applied")
+
+        elif "return" in line:
+            explanation.append("• Function returns a value")
 
         elif "print" in line:
-            explanation.append("• Output is printed to the console")
-
-        elif "def" in line:
-            explanation.append("• A function is defined")
+            explanation.append("• Output is printed")
 
     if not explanation:
-        explanation.append("• The code executes sequentially line by line")
+        explanation.append("• Code executes step by step")
 
     return "\n".join(set(explanation))
 
-    
+
+# -------------------------------
+# 🔹 INLINE COMMENT GENERATOR
+# -------------------------------
+def generate_comments_inline(code: str):
+    lines = code.split("\n")
+    result = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        if stripped.startswith("def"):
+            result.append("# Function definition")
+
+        elif stripped.startswith("for"):
+            result.append("# Loop starts")
+
+        elif stripped.startswith("if"):
+            result.append("# Condition check")
+
+        elif "return" in stripped:
+            result.append("# Return statement")
+
+        elif "print" in stripped:
+            result.append("# Output statement")
+
+        result.append(line)
+
+    return "\n".join(result)

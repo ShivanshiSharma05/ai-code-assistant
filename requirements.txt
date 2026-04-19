@@ -1,7 +1,5 @@
 fastapi
 uvicorn
-transformers
-torch
 streamlit
 requests
 PyGithub
