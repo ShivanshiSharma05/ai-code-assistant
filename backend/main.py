@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Body
-from model import generate_code, generate_comment
-from analyzer import analyze_code
-from github_integration import get_repo_files
-from model import generate_comments_inline
+from backend.model import generate_code, generate_comment
+from backend.analyzer import analyze_code
+from backend.github_integration import get_repo_files
+from backend.model import generate_comments_inline
 
 app = FastAPI()
 
