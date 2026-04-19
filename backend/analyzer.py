@@ -5,7 +5,7 @@ def detect_bugs(code):
         ast.parse(code)
         return "No syntax errors"
     except SyntaxError as e:
-        return f"Syntax Error: {e}"
+        return str(e)
 
 def complexity_analysis(code):
     loops = code.count("for") + code.count("while")
@@ -21,11 +21,10 @@ def complexity_analysis(code):
 
 def suggest_optimization(complexity):
     if complexity == "O(n^2)":
-        return "Try using hashing or sorting to reduce complexity"
+        return "Try using hashing or sorting to optimize"
     elif complexity == "O(n)":
-        return "Consider early exit or binary search optimization"
-    else:
-        return "Code is already optimal"
+        return "Consider binary search or early exit"
+    return "Looks optimal"
 
 def code_quality(code):
     score = 10
@@ -35,37 +34,14 @@ def code_quality(code):
     if "def " not in code:
         score -= 2
     if "#" not in code:
-        score -= 2
+        score -= 1
 
-    return max(score, 0)
+    return max(score, 1)
 
 def analyze_code(code):
-    bugs = detect_bugs(code)
-    complexity = complexity_analysis(code)
-    quality = code_quality(code)
-
     return {
-        "bugs": bugs,
-        "complexity": complexity,
-        "quality_score": quality,
-        "optimization": suggest_optimization(complexity)
+        "bugs": detect_bugs(code),
+        "complexity": complexity_analysis(code),
+        "optimization": suggest_optimization(complexity_analysis(code)),
+        "quality_score": code_quality(code)
     }
-
-def project_analysis(files_dict):
-    report = {}
-    seen_functions = set()
-
-    for file, code in files_dict.items():
-        result = analyze_code(code)
-
-        for line in code.split("\n"):
-            if line.strip().startswith("def "):
-                name = line.split("(")[0]
-                if name in seen_functions:
-                    result["duplication"] = "Duplicate function detected"
-                else:
-                    seen_functions.add(name)
-
-        report[file] = result
-
-    return report

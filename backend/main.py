@@ -1,44 +1,45 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from model import generate_code, generate_comment
-from analyzer import analyze_code, project_analysis
+from analyzer import analyze_code
 from github_integration import get_repo_files
+from model import generate_comments_inline
 
 app = FastAPI()
-
-request_count = 0
-LIMIT = 200
-
-def check_limit():
-    global request_count
-    request_count += 1
-    if request_count > LIMIT:
-        return {"error": "Rate limit exceeded"}
-    return None
 
 @app.get("/")
 def home():
     return {"message": "AI Code Assistant Running"}
 
 @app.post("/generate-code/")
-def gen_code(prompt: str):
-    limit = check_limit()
-    if limit:
-        return limit
+def gen_code(data: dict = Body(...)):
+    prompt = data.get("prompt", "")
     return {"output": generate_code(prompt)}
 
 @app.post("/generate-comment/")
-def gen_comment(code: str):
+def gen_comment(data: dict = Body(...)):
+    code = data.get("code", "")
     return {"output": generate_comment(code)}
 
+@app.post("/generate-inline-comments/")
+def inline_comments(data: dict):
+    code = data.get("code", "")
+    return {"output": generate_comments_inline(code)}
+
 @app.post("/analyze/")
-def analyze(code: str):
+def analyze(data: dict = Body(...)):
+    code = data.get("code", "")
     return analyze_code(code)
 
-@app.post("/project-analysis/")
-def project_level(files: dict):
-    return project_analysis(files)
-
 @app.post("/analyze-repo/")
-def analyze_repo(repo_name: str):
+def analyze_repo(data: dict = Body(...)):
+    repo_name = data.get("repo", "")
     files = get_repo_files(repo_name)
-    return project_analysis(files)
+
+    if "error" in files:
+        return files
+
+    result = {}
+    for file, code in files.items():
+        result[file] = analyze_code(code)
+
+    return result
