@@ -17,7 +17,14 @@ user_input = st.text_area("Enter input")
 if st.button("Run"):
     if mode == "Code Generation":
         res = requests.post(f"{API}/generate-code/", json={"prompt": user_input})
-        st.code(res.json()["output"])
+        data = res.json()
+
+        if "output" in data:
+          st.code(data["output"])
+        elif "error" in data:
+          st.error(data["error"])
+        else:
+          st.write(data)
 
     elif mode == "Code Explanation":
         res = requests.post(f"{API}/generate-comment/", json={"code": user_input})

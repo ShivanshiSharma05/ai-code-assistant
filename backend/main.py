@@ -28,7 +28,7 @@ def inline_comments(data: dict):
 @app.post("/analyze/")
 def analyze(data: dict = Body(...)):
     code = data.get("code", "")
-    return analyze_code(code)
+    return {"output": analyze_code(code)}
 
 @app.post("/analyze-repo/")
 def analyze_repo(data: dict = Body(...)):
@@ -42,4 +42,4 @@ def analyze_repo(data: dict = Body(...)):
     for file, code in files.items():
         result[file] = analyze_code(code)
 
-    return result
+    return {"output": result}

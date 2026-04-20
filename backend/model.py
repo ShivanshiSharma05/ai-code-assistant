@@ -13,18 +13,26 @@ def clean_output(text):
         if not line:
             continue
 
+        # remove unwanted junk lines
+        if "###" in line:
+            continue
+
         clean_lines.append(line)
 
     return "\n".join(clean_lines[:20])
 
 
 # -------------------------------
-# 🔹 CODE GENERATION (LIGHTWEIGHT)
+# 🔹 CODE GENERATION (SMART RULE-BASED)
 # -------------------------------
 def generate_code(prompt: str):
     prompt = prompt.lower()
 
-    if "prime" in prompt:
+    if "reverse string" in prompt:
+        code = """def reverse_string(s):
+    return s[::-1]"""
+
+    elif "prime" in prompt:
         code = """def is_prime(n):
     if n <= 1:
         return False
@@ -42,9 +50,11 @@ def generate_code(prompt: str):
     elif "fibonacci" in prompt:
         code = """def fibonacci(n):
     a, b = 0, 1
+    sequence = []
     for _ in range(n):
-        print(a)
-        a, b = b, a + b"""
+        sequence.append(a)
+        a, b = b, a + b
+    return sequence"""
 
     elif "palindrome" in prompt:
         code = """def is_palindrome(s):
@@ -52,16 +62,28 @@ def generate_code(prompt: str):
 
     elif "sum of array" in prompt or "sum list" in prompt:
         code = """def array_sum(arr):
-    return sum(arr)"""
+    total = 0
+    for num in arr:
+        total += num
+    return total"""
+
+    elif "sort" in prompt:
+        code = """def sort_array(arr):
+    return sorted(arr)"""
 
     else:
-        code = "# Code generation coming soon for this problem..."
+        code = """# Feature coming soon
+# Try prompts like:
+# - reverse string
+# - prime number
+# - factorial
+# - fibonacci"""
 
     return clean_output(code)
 
 
 # -------------------------------
-# 🔹 CODE EXPLANATION
+# 🔹 CODE EXPLANATION (IMPROVED)
 # -------------------------------
 def generate_comment(code: str):
     lines = code.strip().split("\n")
@@ -71,24 +93,35 @@ def generate_comment(code: str):
         line = line.strip()
 
         if line.startswith("def"):
-            explanation.append("• Function is defined")
+            explanation.append("• Defines a function")
 
         elif line.startswith("for"):
-            explanation.append("• Loop is used to iterate")
+            explanation.append("• Uses a loop for iteration")
 
         elif line.startswith("if"):
-            explanation.append("• Conditional check is applied")
+            explanation.append("• Applies conditional logic")
 
         elif "return" in line:
-            explanation.append("• Function returns a value")
+            explanation.append("• Returns output from function")
+
+        elif "append" in line:
+            explanation.append("• Adds elements to a list")
 
         elif "print" in line:
-            explanation.append("• Output is printed")
+            explanation.append("• Prints output")
 
     if not explanation:
-        explanation.append("• Code executes step by step")
+        explanation.append("• Code executes sequentially")
 
-    return "\n".join(set(explanation))
+    # remove duplicates + keep order
+    seen = set()
+    final = []
+    for item in explanation:
+        if item not in seen:
+            seen.add(item)
+            final.append(item)
+
+    return "\n".join(final)
 
 
 # -------------------------------
@@ -105,13 +138,16 @@ def generate_comments_inline(code: str):
             result.append("# Function definition")
 
         elif stripped.startswith("for"):
-            result.append("# Loop starts")
+            result.append("# Loop for iteration")
 
         elif stripped.startswith("if"):
-            result.append("# Condition check")
+            result.append("# Conditional check")
 
         elif "return" in stripped:
-            result.append("# Return statement")
+            result.append("# Returning value")
+
+        elif "append" in stripped:
+            result.append("# Adding to list")
 
         elif "print" in stripped:
             result.append("# Output statement")
