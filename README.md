@@ -1,6 +1,6 @@
 # 🤖 AI Code Assistant
 
-An AI-powered developer tool that helps generate, explain, and analyze code using transformer models and static analysis techniques.
+An AI-powered developer tool to generate, explain, and analyze code, designed with a scalable full-stack architecture and real-world GitHub integration.
 
 ---
 
@@ -11,6 +11,9 @@ An AI-powered developer tool that helps generate, explain, and analyze code usin
 
 * 🧠 **Code Explanation**
   Automatically explain code in simple terms
+
+* 💬 **Code Comment Generator**
+  Automatically add inline comments to improve code readability  
 
 * 🔍 **Bug Detection**
   Detect syntax errors using Python AST
@@ -30,7 +33,7 @@ An AI-powered developer tool that helps generate, explain, and analyze code usin
 
 * **Backend:** FastAPI
 * **Frontend:** Streamlit
-* **AI Model:** Transformers (CodeGen)
+* **Deployment:** Render + Streamlit Cloud
 * **Code Analysis:** Python AST
 * **API Handling:** Requests
 
@@ -101,9 +104,10 @@ streamlit run frontend/app.py
 
 ---
 
-## 📸 Demo (Optional)
+## 🌐 Live Demo 
 
-*Add screenshots here after deployment*
+🔗 Frontend: https://ai-code-assistant-tkog4qgwly6e4i7qoupvrb.streamlit.app/
+🔗 Backend API: https://ai-code-assistant-f1lw.onrender.com⁠�
 
 ---
 
