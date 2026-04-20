@@ -107,7 +107,7 @@ streamlit run frontend/app.py
 ## 🌐 Live Demo 
 
 * 🔗 Frontend: https://ai-code-assistant-tkog4qgwly6e4i7qoupvrb.streamlit.app/
-* 🔗 Backend API: https://ai-code-assistant-f1lw.onrender.com⁠�
+* 🔗 Backend API: https://ai-code-assistant-f1lw.onrender.com
 
 ---
 
