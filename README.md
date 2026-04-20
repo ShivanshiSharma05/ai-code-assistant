@@ -6,25 +6,25 @@ An AI-powered developer tool to generate, explain, and analyze code, designed wi
 
 ## 🚀 Features
 
-* 💻 **Code Generation**
+* 💻 **Code Generation:**
   Generate Python code from natural language prompts using transformer models
 
-* 🧠 **Code Explanation**
+* 🧠 **Code Explanation:**
   Automatically explain code in simple terms
 
-* 💬 **Code Comment Generator**
+* 💬 **Code Comment Generator:**
   Automatically add inline comments to improve code readability  
 
-* 🔍 **Bug Detection**
+* 🔍 **Bug Detection:**
   Detect syntax errors using Python AST
 
-* 📊 **Time Complexity Analysis**
+* 📊 **Time Complexity Analysis:**
   Estimate algorithm complexity (O(1), O(n), O(n²), etc.)
 
-* ⚡ **Optimization Suggestions**
+* ⚡ **Optimization Suggestions:**
   Suggest improvements based on detected complexity
 
-* 📁 **GitHub Repository Analysis**
+* 📁 **GitHub Repository Analysis:**
   Analyze real-world repositories and evaluate code quality
 
 ---
@@ -106,8 +106,8 @@ streamlit run frontend/app.py
 
 ## 🌐 Live Demo 
 
-🔗 Frontend: https://ai-code-assistant-tkog4qgwly6e4i7qoupvrb.streamlit.app/
-🔗 Backend API: https://ai-code-assistant-f1lw.onrender.com⁠�
+* 🔗 Frontend: https://ai-code-assistant-tkog4qgwly6e4i7qoupvrb.streamlit.app/
+* 🔗 Backend API: https://ai-code-assistant-f1lw.onrender.com⁠�
 
 ---
 
