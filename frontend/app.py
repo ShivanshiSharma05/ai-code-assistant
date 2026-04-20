@@ -15,39 +15,63 @@ mode = st.sidebar.selectbox(
 user_input = st.text_area("Enter input")
 
 if st.button("Run"):
+
+    # ========================
+    # 🚀 CODE GENERATION 
+    # ========================
     if mode == "Code Generation":
         res = requests.post(f"{API}/generate-code/", json={"prompt": user_input})
         data = res.json()
 
         if "output" in data:
-          st.code(data["output"])
+            st.code(data["output"])   
         elif "error" in data:
-          st.error(data["error"])
+            st.error(data["error"])
         else:
-          st.write(data)
+            st.write(data)
 
+    # ========================
+    # 🧠 CODE EXPLANATION 
+    # ========================
     elif mode == "Code Explanation":
         res = requests.post(f"{API}/generate-comment/", json={"code": user_input})
-        st.write(res.json()["output"])
-        
+        data = res.json()
 
+        if "output" in data:
+            st.write(data["output"])   
+        else:
+            st.error(data)
+
+    # ========================
+    # 🔍 CODE ANALYSIS 
+    # ========================
     elif mode == "Code Analysis":
         res = requests.post(f"{API}/analyze/", json={"code": user_input})
         data = res.json()
-        
 
-        st.write("### Bugs:", data["bugs"])
-        st.write("### Complexity:", data["complexity"])
-        st.write("### Optimization:", data["optimization"])
-        st.write("### Quality Score:", data["quality_score"])
+        if "output" in data:
+            result = data["output"]
 
+            st.write("### Bugs:", result.get("bugs", "N/A"))
+            st.write("### Complexity:", result.get("complexity", "N/A"))
+            st.write("### Optimization:", result.get("optimization", "N/A"))
+            st.write("### Quality Score:", result.get("quality_score", "N/A"))
+        else:
+            st.error(data)
+
+    # ========================
+    # 🐙 GITHUB ANALYSIS 
+    # ========================
     elif mode == "GitHub Analysis":
         res = requests.post(f"{API}/analyze-repo/", json={"repo": user_input})
         st.json(res.json())
 
+    # ========================
+    # 💬 COMMENT GENERATOR 
+    # ========================
     elif mode == "Code Comment Generator":
         res = requests.post(
             f"{API}/generate-inline-comments/",
             json={"code": user_input}
-    )
-    st.code(res.json()["output"])    
+        )
+        st.code(res.json()["output"])
