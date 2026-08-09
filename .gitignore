@@ -1,10 +1,17 @@
+# Environment variables
+.env
+
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 
-# Virtual env
+# Virtual environment
 venv/
-env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
 
 # Streamlit
 .streamlit/
