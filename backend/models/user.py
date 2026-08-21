@@ -16,6 +16,8 @@ class User(Base):
 
     repositories = relationship(
         "Repository",
-        back_populates="owner",
+        back_populates="user",
         cascade="all, delete-orphan"
     )    
+
+   

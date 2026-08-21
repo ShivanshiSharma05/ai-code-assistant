@@ -12,11 +12,15 @@ from models.analysis import Analysis
 from models.issue import Issue
 
 from api.auth import router as auth_router
+from api.repositories import router as repository_router
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.include_router(auth_router)
+app.include_router(repository_router)
 
 app.include_router(auth_router)
 
