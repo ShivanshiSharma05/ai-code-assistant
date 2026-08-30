@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text
-from sqlalchemy.orm import relationship
 
 from core.database import Base
+from sqlalchemy.orm import relationship
 
 
 class Issue(Base):
@@ -19,11 +19,9 @@ class Issue(Base):
 
     line_number = Column(Integer, nullable=True)
 
-    severity = Column(String(50), nullable=False)
+    severity = Column(String(50), nullable=True)
 
-    message = Column(Text, nullable=False)
-
-    suggestion = Column(Text, nullable=True)
+    message = Column(Text, nullable=True)
 
     analysis = relationship(
         "Analysis",

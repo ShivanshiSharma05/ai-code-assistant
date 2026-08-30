@@ -9,17 +9,17 @@ class Repository(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id"),
-        nullable=False
-    )
-
     name = Column(String(255), nullable=False)
 
     url = Column(String(500), nullable=False)
 
-    description = Column(String(1000), nullable=True)
+    description = Column(String(500), nullable=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True
+    )
 
     user = relationship(
         "User",

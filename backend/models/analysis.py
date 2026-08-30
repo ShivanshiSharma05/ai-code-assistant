@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 
 from core.database import Base
 
@@ -16,14 +15,15 @@ class Analysis(Base):
         nullable=False
     )
 
-    status = Column(String(50), nullable=False, default="completed")
+    file_name = Column(String(500), nullable=False)
 
-    summary = Column(Text, nullable=True)
+    bugs = Column(Text, nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now()
-    )
+    complexity = Column(String(100), nullable=True)
+
+    optimization = Column(Text, nullable=True)
+
+    quality_score = Column(Integer, nullable=True)
 
     repository = relationship(
         "Repository",
