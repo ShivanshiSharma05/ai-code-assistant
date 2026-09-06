@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from core.database import Base
@@ -9,11 +9,20 @@ class Repository(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String(255), nullable=False)
+    name = Column(
+        String(255),
+        nullable=False
+    )
 
-    url = Column(String(500), nullable=False)
+    url = Column(
+        String(500),
+        nullable=False
+    )
 
-    description = Column(String(500), nullable=True)
+    description = Column(
+        Text,
+        nullable=True
+    )
 
     user_id = Column(
         Integer,

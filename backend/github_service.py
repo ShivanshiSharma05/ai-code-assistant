@@ -1,50 +1,62 @@
 import os
-import base64
-from pathlib import Path
-
 import requests
 from dotenv import load_dotenv
 
 
-# ============================================================
-# Load ROOT .env
-# ============================================================
+# Load .env from project root
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ENV_PATH = os.path.join(BASE_DIR, ".env")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = BASE_DIR / ".env"
+load_dotenv(ENV_PATH)
 
-load_dotenv(ENV_FILE)
-
-
-# ============================================================
-# GitHub Token
-# ============================================================
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
-
-# ============================================================
-# GitHub API Headers
-# ============================================================
 
 HEADERS = {
     "Accept": "application/vnd.github+json"
 }
 
+
+# Add token only if available
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
 
-# ============================================================
-# Get Repository Information
-# ============================================================
+# =========================================================
+# GET REPOSITORY INFORMATION
+# =========================================================
 
-def get_repository_info(owner, repo):
-    """
-    Get basic information about a GitHub repository.
-    """
+def get_repository_info(repo_name):
 
-    url = f"https://api.github.com/repos/{owner}/{repo}"
+    url = f"https://api.github.com/repos/{repo_name}"
+
+    response = requests.get(
+        url,
+        headers=HEADERS,
+        timeout=20
+    )
+
+    if response.status_code != 200:
+
+        raise Exception(
+            f"GitHub API error: {response.status_code} - "
+            f"{response.text}"
+        )
+
+    return response.json()
+
+
+# =========================================================
+# GET REPOSITORY FILE TREE
+# =========================================================
+
+def get_repository_tree(repo_name):
+
+    url = (
+        f"https://api.github.com/repos/"
+        f"{repo_name}/git/trees/HEAD?recursive=1"
+    )
 
     response = requests.get(
         url,
@@ -53,219 +65,113 @@ def get_repository_info(owner, repo):
     )
 
     if response.status_code != 200:
-        return {
-            "error": f"GitHub API error: {response.status_code}",
-            "details": response.text
-        }
 
-    return response.json()
-
-
-# ============================================================
-# Get Repository Files
-# ============================================================
-
-def get_repo_files(repo_name):
-    """
-    Fetch source-code files from a GitHub repository.
-
-    Expected format:
-
-        owner/repository
-
-    Example:
-
-        ShivanshiSharma05/ai-code-assistant
-    """
-
-    # --------------------------------------------------------
-    # Validate repository format
-    # --------------------------------------------------------
-
-    repo_name = repo_name.strip()
-
-    if repo_name.startswith("https://github.com/"):
-        repo_name = repo_name.replace(
-            "https://github.com/",
-            "",
-            1
+        raise Exception(
+            f"GitHub API error while fetching tree: "
+            f"{response.status_code} - {response.text}"
         )
 
-    repo_name = repo_name.rstrip("/")
+    data = response.json()
 
-    parts = repo_name.split("/")
+    return data.get("tree", [])
 
-    if len(parts) != 2 or not parts[0] or not parts[1]:
-        return {
-            "error": (
-                "Invalid repository format. "
-                "Use owner/repository or a GitHub URL."
-            )
-        }
 
-    owner = parts[0]
-    repo = parts[1]
+# =========================================================
+# GET SINGLE FILE CONTENT
+# =========================================================
 
-    # --------------------------------------------------------
-    # Get repository information
-    # --------------------------------------------------------
+def get_file_content(repo_name, file_path):
 
-    repo_info = get_repository_info(owner, repo)
-
-    if "error" in repo_info:
-        return repo_info
-
-    # --------------------------------------------------------
-    # Find default branch
-    # --------------------------------------------------------
-
-    default_branch = repo_info.get(
-        "default_branch",
-        "main"
-    )
-
-    # --------------------------------------------------------
-    # Get repository tree
-    # --------------------------------------------------------
-
-    tree_url = (
+    url = (
         f"https://api.github.com/repos/"
-        f"{owner}/{repo}/git/trees/"
-        f"{default_branch}?recursive=1"
+        f"{repo_name}/contents/{file_path}"
     )
 
     response = requests.get(
-        tree_url,
+        url,
         headers=HEADERS,
-        timeout=30
+        timeout=20
     )
 
     if response.status_code != 200:
-        return {
-            "error": f"Unable to fetch repository tree: {response.status_code}",
-            "details": response.text
-        }
 
-    tree_data = response.json()
+        return None
 
-    # --------------------------------------------------------
-    # Check tree response
-    # --------------------------------------------------------
+    data = response.json()
 
-    if "tree" not in tree_data:
-        return {
-            "error": "GitHub repository tree could not be retrieved."
-        }
+    # GitHub gives download_url for files
+    download_url = data.get("download_url")
+
+    if not download_url:
+        return None
+
+    file_response = requests.get(
+        download_url,
+        headers=HEADERS,
+        timeout=20
+    )
+
+    if file_response.status_code != 200:
+        return None
+
+    return file_response.text
+
+
+# =========================================================
+# GET ALL SUPPORTED REPOSITORY FILES
+# =========================================================
+
+def get_repository_files(repo_name):
+
+    tree = get_repository_tree(repo_name)
+
+    supported_extensions = (
+        ".py",
+        ".js",
+        ".ts",
+        ".java",
+        ".cpp",
+        ".c"
+    )
 
     files = {}
 
-    # --------------------------------------------------------
-    # Supported source-code extensions
-    # --------------------------------------------------------
+    for item in tree:
 
-    allowed_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".cpp",
-        ".c",
-        ".h",
-        ".hpp",
-        ".cs",
-        ".go",
-        ".rs",
-        ".php",
-        ".rb",
-        ".swift",
-        ".kt",
-        ".kts",
-        ".html",
-        ".css"
-    )
-
-    # --------------------------------------------------------
-    # Files/folders we don't need to analyze
-    # --------------------------------------------------------
-
-    ignored_parts = {
-        ".git",
-        "node_modules",
-        "__pycache__",
-        ".venv",
-        "venv",
-        "dist",
-        "build"
-    }
-
-    # --------------------------------------------------------
-    # Fetch individual files
-    # --------------------------------------------------------
-
-    for item in tree_data["tree"]:
-
+        # Only files
         if item.get("type") != "blob":
             continue
 
-        path = item.get("path", "")
+        file_path = item.get("path")
 
-        # Ignore unnecessary directories
-        path_parts = Path(path).parts
+        # Skip unsupported files
+        if not file_path.endswith(supported_extensions):
+            continue
 
-        if any(
-            part in ignored_parts
-            for part in path_parts
+        # Skip unnecessary folders
+        if (
+            "node_modules/" in file_path
+            or ".git/" in file_path
+            or "venv/" in file_path
+            or "__pycache__/" in file_path
         ):
             continue
 
-        # Only analyze supported source files
-        if not path.lower().endswith(allowed_extensions):
-            continue
+        try:
 
-        file_url = (
-            f"https://api.github.com/repos/"
-            f"{owner}/{repo}/contents/{path}"
-        )
+            content = get_file_content(
+                repo_name,
+                file_path
+            )
 
-        file_response = requests.get(
-            file_url,
-            headers=HEADERS,
-            timeout=30
-        )
+            if content:
 
-        if file_response.status_code != 200:
-            continue
+                files[file_path] = content
 
-        file_data = file_response.json()
+        except Exception as e:
 
-        # ----------------------------------------------------
-        # GitHub normally returns Base64 content
-        # ----------------------------------------------------
-
-        if file_data.get("encoding") == "base64":
-
-            try:
-                content = base64.b64decode(
-                    file_data["content"]
-                ).decode(
-                    "utf-8",
-                    errors="ignore"
-                )
-
-                files[path] = content
-
-            except Exception:
-                continue
-
-    # --------------------------------------------------------
-    # No source files found
-    # --------------------------------------------------------
-
-    if not files:
-        return {
-            "error": "No supported source-code files found in repository."
-        }
+            print(
+                f"Could not fetch {file_path}: {str(e)}"
+            )
 
     return files
