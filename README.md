@@ -2,7 +2,7 @@
 
 ### AI-Powered Repository Intelligence Platform
 
-An intelligent developer tool that analyzes public GitHub repositories, detects risky code, calculates complexity indicators, prioritizes files, and generates actionable recommendations for developers.
+An intelligent developer tool that analyzes public GitHub repositories, detects risky code, evaluates complexity indicators, prioritizes files, and generates actionable recommendations for developers.
 
 Unlike traditional AI assistants that require developers to manually paste code snippets, AI Code Assistant performs **repository-level automated analysis** and helps answer an important engineering question:
 
@@ -27,7 +27,7 @@ AI Code Assistant automates repository analysis by:
 - Ranking files based on priority
 - Providing actionable developer recommendations
 
-The platform focuses on transforming raw code analysis into **Repository Intelligence**.
+The platform transforms raw code analysis into **Repository Intelligence**.
 
 ---
 
@@ -112,7 +112,7 @@ Files are automatically ranked according to their priority score.
 
 This helps developers answer:
 
-> What should I fix first?
+> **What should I fix first?**
 
 Instead of manually reviewing every file, developers receive a prioritized list of files requiring attention.
 
@@ -152,11 +152,23 @@ The Streamlit dashboard provides:
 
 ---
 
+# 📸 Screenshots
+
+## Repository Intelligence Dashboard
+
+![Repository Intelligence Dashboard](screenshots/dashboard.png)
+
+## Hard Test – Risk Detection
+
+![Hard Test Risk Detection](screenshots/hard-test.png)
+
+---
+
 # 🧠 What Makes This Different From ChatGPT?
 
 A common question is:
 
-> Why use this project when ChatGPT can analyze code?
+> **Why use this project when ChatGPT can analyze code?**
 
 Traditional AI chat assistants generally require developers to:
 
@@ -320,6 +332,8 @@ AI_Code_Assistant/
 │   └── app.py
 │
 ├── screenshots/
+│   ├── dashboard.png
+│   └── hard-test.png
 │
 ├── .env.example
 ├── .gitignore
@@ -334,8 +348,8 @@ AI_Code_Assistant/
 ## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-cd AI_Code_Assistant
+git clone https://github.com/ShivanshiSharma05/ai-code-assistant.git
+cd ai-code-assistant
 ```
 
 ---
@@ -382,11 +396,8 @@ For backend configuration:
 
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/database_name
-
 SECRET_KEY=your_secret_key
-
 ALGORITHM=HS256
-
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
@@ -473,12 +484,6 @@ The Streamlit dashboard will open automatically.
 
 The project was tested using files with different complexity levels.
 
-Example repository:
-
-```text
-ai-code-assistant-test
-```
-
 Test files:
 
 ```text
@@ -533,42 +538,6 @@ This demonstrates that the system can differentiate between complex and simple c
 
 ---
 
-# 📸 Screenshots
-
-## Repository Intelligence Dashboard
-
-_Add your dashboard screenshot here._
-
-```text
-screenshots/dashboard.png
-```
-
-## Repository Risk Analysis
-
-_Add your hard test result screenshot here._
-
-```text
-screenshots/hard-test.png
-```
-
-## Developer Priority Queue
-
-_Add your priority queue screenshot here._
-
-```text
-screenshots/priority-queue.png
-```
-
-## Detailed File Analysis
-
-_Add your detailed analysis screenshot here._
-
-```text
-screenshots/detailed-analysis.png
-```
-
----
-
 # 🎯 Key Innovation
 
 The core innovation of AI Code Assistant is the combination of:
@@ -585,13 +554,19 @@ Priority Ranking
 Repository Intelligence
 ```
 
-Most code analysis tools provide raw warnings.
+The system transforms raw analysis into an actionable developer workflow:
 
-This platform attempts to transform analysis results into an actionable developer workflow:
+```text
+Analyze
+   ↓
+Detect Risk
+   ↓
+Rank Files
+   ↓
+Recommend Action
+```
 
-> **Analyze → Detect Risk → Rank Files → Recommend Action**
-
-Instead of simply telling developers that a file has an issue, the system helps prioritize engineering attention.
+Instead of simply reporting issues, the platform helps developers prioritize engineering attention.
 
 ---
 
