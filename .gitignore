@@ -1,29 +1,47 @@
-# Virtual Environment
+# =========================
+# Virtual Environments
+# =========================
 venv/
 .venv/
 
-# Environment variables / Secrets
+# =========================
+# Environment Variables
+# =========================
 .env
 backend/.env
+frontend/.env
 
-# Python cache
+# =========================
+# Python Cache
+# =========================
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Streamlit
-.streamlit/
-
+# =========================
 # IDE
+# =========================
 .vscode/
 .idea/
 
-# OS files
+# =========================
+# OS Files
+# =========================
 .DS_Store
 Thumbs.db
 
-# Database files
+# =========================
+# Database
+# =========================
 *.db
 *.sqlite3
 
+# =========================
 # Logs
+# =========================
 *.log
+
+# =========================
+# Streamlit
+# =========================
+.streamlit/secrets.toml
